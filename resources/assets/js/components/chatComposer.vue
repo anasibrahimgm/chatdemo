@@ -17,7 +17,9 @@ export default {
       console.log(this.newMessage, "Sent");
       this.$emit('messagesent', {
         message: this.newMessage,
-        user: 'osama',
+        user: {
+          name: $('.navbar-right .dropdown-toggle').text(),
+        },
       });
       this.newMessage = '';
     },
@@ -28,10 +30,12 @@ export default {
 <style>
 .chat-composer {
   display: flex;
+  margin: 10px;
 }
 
 .chat-composer input{
   flex: 1 auto;
+  border: none;
 }
 
 .chat-composer button{

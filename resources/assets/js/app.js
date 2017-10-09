@@ -25,23 +25,39 @@ const app = new Vue({
 
     data() {
       return {
-        messages: [
-          {
-            message: "messageOne",
-            user: "userOne"
-          },
-          {
-            message: "message2",
-            user: "user2"
-          },
-        ],
+        messages: [],
       }
     },
 
     methods: {
       addMessage(message) {
+        // Add to the existing messages
         this.messages.push(message);
-        console.log("msg added");
+
+        // push to the DB
+        axios.post('messages', message)
+        .then(response => {
+          console.log(response);
+        })
+        .catch(error => {
+          if (error.response) {
+            console.log("Error 1");
+             console.log(error.response);
+
+           } else if (error.request) {
+             console.log("Error 2");
+             console.log(error.request);
+           } else {
+             console.log("Error 3");
+             console.log('Error', error.message);
+           }
+        });
       }
+    },
+
+    created() {
+      axios.get('messages').then(response => {
+        this.messages = response.data;
+      });
     },
 });
