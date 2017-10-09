@@ -16,7 +16,32 @@ window.Vue = require('vue');
  */
 
 Vue.component('example', require('./components/Example.vue'));
+Vue.component('chat-log', require('./components/chatLog.vue'));
+Vue.component('chat-message', require('./components/chatMessage.vue'));
+Vue.component('chat-composer', require('./components/chatComposer.vue'));
 
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+
+    data() {
+      return {
+        messages: [
+          {
+            message: "messageOne",
+            user: "userOne"
+          },
+          {
+            message: "message2",
+            user: "user2"
+          },
+        ],
+      }
+    },
+
+    methods: {
+      addMessage(message) {
+        this.messages.push(message);
+        console.log("msg added");
+      }
+    },
 });
