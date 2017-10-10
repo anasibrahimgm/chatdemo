@@ -26,6 +26,7 @@ const app = new Vue({
     data() {
       return {
         messages: [],
+        usersInRoom: [],
       }
     },
 
@@ -35,9 +36,9 @@ const app = new Vue({
         this.messages.push(message);
 
         // push to the DB
-        axios.post('messages', message)
+        axios.post('/messages', message)
         .then(response => {
-          console.log(response);
+          //console.log(response);
         })
         .catch(error => {
           if (error.response) {
@@ -56,8 +57,26 @@ const app = new Vue({
     },
 
     created() {
-      axios.get('messages').then(response => {
-        this.messages = response.data;
-      });
-    },
+       axios.get('/messages').then(response => {
+           this.messages = response.data;
+       });
+
+       Echo.join('chatroom')
+           .here((users) => {
+               this.usersInRoom = users;
+              //  console.log("this.usersInRoom: ", this.usersInRoom[0].name);
+           })
+           .joining((user) => {
+               this.usersInRoom.push(user);
+           })
+           .leaving((user) => {
+               this.usersInRoom = this.usersInRoom.filter(u => u != user)
+           })
+           .listen('MessagePosted', (e) => {
+               this.messages.push({
+                   message: e.message.message,
+                   user: e.user
+               });
+           });
+   }
 });

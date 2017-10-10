@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\MessagePosted;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -24,13 +25,14 @@ Route::get('/messages', function () {
 })->middleware('auth');
 
 Route::post('/messages', function () {
-    //Store the new message
+    // Store the new message
     $user = Auth::user();
-    $user->messages()->create([
-      'message' => request()->get('message'),
+    $message = $user->messages()->create([
+        'message' => request()->get('message')
     ]);
-
-    return ['status' => 'OK'];
+    // Announce that a new message has been posted
+    broadcast(new MessagePosted($message, $user))->toOthers();
+    return ['status' => 'Message Added'];
 })->middleware('auth');
 
 Auth::routes();

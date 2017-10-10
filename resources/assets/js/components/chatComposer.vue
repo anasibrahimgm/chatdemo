@@ -14,7 +14,7 @@ export default {
 
   methods: {
     sendMessage() {
-      console.log(this.newMessage, "Sent");
+      // console.log(this.newMessage, "Sent");
       this.$emit('messagesent', {
         message: this.newMessage,
         user: {
