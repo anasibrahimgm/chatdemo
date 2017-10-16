@@ -1,9 +1,10 @@
 <template>
   <div class="chat-room">
-    <div class="chat-message" v-for="message in chatroom.messages" :class="message.user_id == chatroom.pivot.user_id ? 'sender' : 'receiver'">
-      <span>{{ message.message }}</span>
-      <br />
-      <small>{{ message.created_at }}</small>
+    <div v-for="message in chatroom.messages"  :class="'chat-message ' + (message.user_id == chatroom.pivot.user_id ? 'sender' : 'receiver')">
+      <div class="msg-text">
+        <p style="margin-bottom:0;">{{ message.message }}</p>
+        <small style="text-align:right;">{{ message.created_at }}</small>
+      </div>
     </div>
     <chat-composer v-on:messagesent="addMessage"></chat-composer>
   </div>
@@ -60,7 +61,7 @@ export default {
         })
         .leaving((user) => {
             this.usersInRoom = this.usersInRoom.filter(u => u != user);
-            $(element).removeClass('activeI');            
+            $(element).removeClass('activeI');
         })
         .listen('newMessage', (e) => {
           this.chatroom.messages.push(e.message);
@@ -75,39 +76,38 @@ export default {
   border: 1px solid #ccc;
 }
 
-.chat-room .chat-message{
-  margin: 10px;
+.chat-message {
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: 5px;
+}
+
+.msg-text {
+  padding: 2px 4px;
+  margin-bottom: 0;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #FFF;
+}
+
+.receiver .msg-text{
+  background-color: #ccc;
+  max-width: 70%;
+  float: left;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.sender .msg-text {
+  max-width: 70%;
+  float: right;
+  box-sizing: border-box;
+  overflow: hidden;
+  background-color: #3097D1;
 }
 
 small {
   font-size: 70%;
-  color: #FFF !important;
-}
-
-.sender {
-  text-align: right;
-  background-color: #3097D1;
-}
-
-.receiver {
-  text-align: left;
-  background-color: #ccc;
-}
-
-.sender span, .receiver span {
-  max-width: 60%;
-  font-size: 14px;
-}
-
-.sender, .receiver {
-  color: #000;
-  padding: 2px 4px;
-  margin-bottom: 0;
-  border-radius: 4px;
-}
-
-.empty {
-  padding: 1rem;
-  text-align: center;
+  color: #777777 !important;
 }
 </style>

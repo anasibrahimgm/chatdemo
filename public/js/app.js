@@ -47729,7 +47729,7 @@ exports = module.exports = __webpack_require__(3)(undefined);
 
 
 // module
-exports.push([module.i, "\n.chat-room {\n  margin: 0 5px;\n  border: 1px solid #ccc;\n}\n.chat-room .chat-message{\n  margin: 10px;\n}\nsmall {\n  font-size: 70%;\n  color: #FFF !important;\n}\n.sender {\n  text-align: right;\n  background-color: #3097D1;\n}\n.receiver {\n  text-align: left;\n  background-color: #ccc;\n}\n.sender span, .receiver span {\n  max-width: 60%;\n  font-size: 14px;\n}\n.sender, .receiver {\n  color: #000;\n  padding: 2px 4px;\n  margin-bottom: 0;\n  border-radius: 4px;\n}\n.empty {\n  padding: 1rem;\n  text-align: center;\n}\n", ""]);
+exports.push([module.i, "\n.chat-room {\n  margin: 0 5px;\n  border: 1px solid #ccc;\n}\n.chat-message {\n  overflow: hidden;\n  box-sizing: border-box;\n  margin: 5px;\n}\n.msg-text {\n  padding: 2px 4px;\n  margin-bottom: 0;\n  border-radius: 4px;\n  font-size: 14px;\n  color: #FFF;\n}\n.receiver .msg-text{\n  background-color: #ccc;\n  max-width: 70%;\n  float: left;\n  box-sizing: border-box;\n  overflow: hidden;\n}\n.sender .msg-text {\n  max-width: 70%;\n  float: right;\n  box-sizing: border-box;\n  overflow: hidden;\n  background-color: #3097D1;\n}\nsmall {\n  font-size: 70%;\n  color: #777777 !important;\n}\n", ""]);
 
 // exports
 
@@ -47740,6 +47740,7 @@ exports.push([module.i, "\n.chat-room {\n  margin: 0 5px;\n  border: 1px solid #
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
 //
 //
 //
@@ -47825,18 +47826,22 @@ var render = function() {
         return _c(
           "div",
           {
-            staticClass: "chat-message",
             class:
-              message.user_id == _vm.chatroom.pivot.user_id
+              "chat-message " +
+              (message.user_id == _vm.chatroom.pivot.user_id
                 ? "sender"
-                : "receiver"
+                : "receiver")
           },
           [
-            _c("span", [_vm._v(_vm._s(message.message))]),
-            _vm._v(" "),
-            _c("br"),
-            _vm._v(" "),
-            _c("small", [_vm._v(_vm._s(message.created_at))])
+            _c("div", { staticClass: "msg-text" }, [
+              _c("p", { staticStyle: { "margin-bottom": "0" } }, [
+                _vm._v(_vm._s(message.message))
+              ]),
+              _vm._v(" "),
+              _c("small", { staticStyle: { "text-align": "right" } }, [
+                _vm._v(_vm._s(message.created_at))
+              ])
+            ])
           ]
         )
       }),
