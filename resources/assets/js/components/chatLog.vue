@@ -1,35 +1,68 @@
 <template>
   <div class="chat-log">
-    <chat-message v-for="message in messages" :message="message"></chat-message>
-    <div class="empty" v-show="messages.length === 0">
-      No Messages..
+    <div class="chat-log-left">
+      <ul class="nav nav-pills nav-stacked">
+        <li v-for="chatroom in chatrooms" :class="chatroom.id === chatrooms[0].id ? 'active' : ''"><a data-toggle="pill" :href="'#chatroom'+chatroom.id">
+          {{ chatroom.users[0].id == chatroom.pivot.user_id ? chatroom.users[1].name : chatroom.users[0].name }}
+        </a></li>
+      </ul>
     </div>
+
+  <div class="tab-content chat-log-right">
+    <chat-room v-for="chatroom in chatrooms"
+                :chatroom="chatroom" :id="'chatroom'+chatroom.id"
+                :class="'tab-pane fade'  +  (chatroom.id === chatrooms[0].id ? 'in active' : '')"
+                >
+    </chat-room>
+  </div>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['messages',],
+  props: ['chatrooms'],
 
   data() {
     return {
-
+      usersInRoom: [],
     }
-  }
+  },
+
+  methods: {
+
+  },
+
+  created() {
+   }
 }
 </script>
 
 <style>
+a {
+  color: #000 !important;
+}
+
 .chat-log {
-  margin: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: 0 10px;
 }
 
-.chat-log .chat-message:nth-child(even) {
-  background-color: #ccc;
+.chat-log-left {
+  float: left;
+  width: 25%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.empty {
-  padding: 1rem;
-  text-align: center;
+.chat-log-right {
+  float: right;
+  width: 75%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.nav-pills > li.active > a {
+  background-color: #ccc !important;
 }
 </style>

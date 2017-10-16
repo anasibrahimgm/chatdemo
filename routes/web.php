@@ -1,6 +1,9 @@
 <?php
 
-use App\Events\MessagePosted;
+use App\User;
+use App\ChatRoom;
+use App\Message;
+use Illuminate\Support\Collection;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,21 +23,13 @@ Route::get('/chat', function () {
     return view('chat');
 })->middleware('auth');
 
-Route::get('/messages', function () {
-    return App\Message::with('user')->get();
-})->middleware('auth');
+Route::get('/chatrooms', 'ChatController@index')->middleware('auth');
 
-Route::post('/messages', function () {
-    // Store the new message
-    $user = Auth::user();
-    $message = $user->messages()->create([
-        'message' => request()->get('message')
-    ]);
-    // Announce that a new message has been posted
-    broadcast(new MessagePosted($message, $user))->toOthers();
-    return ['status' => 'Message Added'];
-})->middleware('auth');
+Route::post('/messages', 'ChatController@newMessage')->middleware('auth');
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/test', function () {
+})->middleware('auth');

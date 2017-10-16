@@ -9,7 +9,7 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    protected $table = 'chatdemo_users';    
+    protected $table = 'chatdemo_users';
 
     /**
      * The attributes that are mass assignable.
@@ -26,10 +26,15 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token','created_at', 'updated_at',
     ];
+
+    public function chatrooms() {
+      return $this->belongsToMany(ChatRoom::class, 'chatdemo_chatroom_user', 'user_id', 'chatroom_id');
+    }
 
     public function messages() {
       return $this->hasMany(Message::class);
     }
+
 }

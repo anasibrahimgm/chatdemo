@@ -14,14 +14,10 @@ export default {
 
   methods: {
     sendMessage() {
-      // console.log(this.newMessage, "Sent");
-      this.$emit('messagesent', {
-        message: this.newMessage,
-        user: {
-          name: $('.navbar-right .dropdown-toggle').text(),
-        },
-      });
-      this.newMessage = '';
+      if (this.newMessage) {//not empty message
+        this.$emit('messagesent', this.newMessage);
+        this.newMessage = '';
+      }
     },
   }
 }

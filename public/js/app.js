@@ -1199,7 +1199,7 @@ window.Vue = __webpack_require__(40);
 
 Vue.component('example', __webpack_require__(41));
 Vue.component('chat-log', __webpack_require__(44));
-Vue.component('chat-message', __webpack_require__(50));
+Vue.component('chat-room', __webpack_require__(50));
 Vue.component('chat-composer', __webpack_require__(55));
 
 var app = new Vue({
@@ -1207,56 +1207,18 @@ var app = new Vue({
 
   data: function data() {
     return {
-      messages: [],
-      usersInRoom: []
+      chatrooms: []
     };
   },
 
 
-  methods: {
-    addMessage: function addMessage(message) {
-      // Add to the existing messages
-      this.messages.push(message);
-
-      // push to the DB
-      axios.post('/messages', message).then(function (response) {
-        //console.log(response);
-      }).catch(function (error) {
-        if (error.response) {
-          console.log("Error 1");
-          console.log(error.response);
-        } else if (error.request) {
-          console.log("Error 2");
-          console.log(error.request);
-        } else {
-          console.log("Error 3");
-          console.log('Error', error.message);
-        }
-      });
-    }
-  },
+  methods: {},
 
   created: function created() {
     var _this = this;
 
-    axios.get('/messages').then(function (response) {
-      _this.messages = response.data;
-    });
-
-    Echo.join('chatroom').here(function (users) {
-      _this.usersInRoom = users;
-      //  console.log("this.usersInRoom: ", this.usersInRoom[0].name);
-    }).joining(function (user) {
-      _this.usersInRoom.push(user);
-    }).leaving(function (user) {
-      _this.usersInRoom = _this.usersInRoom.filter(function (u) {
-        return u != user;
-      });
-    }).listen('MessagePosted', function (e) {
-      _this.messages.push({
-        message: e.message.message,
-        user: e.user
-      });
+    axios.get('/chatrooms').then(function (response) {
+      _this.chatrooms = response.data;
     });
   }
 });
@@ -47525,7 +47487,7 @@ exports = module.exports = __webpack_require__(3)(undefined);
 
 
 // module
-exports.push([module.i, "\n.chat-log {\n  margin: 10px;\n}\n.chat-log .chat-message:nth-child(even) {\n  background-color: #ccc;\n}\n.empty {\n  padding: 1rem;\n  text-align: center;\n}\n", ""]);
+exports.push([module.i, "\na {\n  color: #000 !important;\n}\n.chat-log {\n  overflow: hidden;\n  box-sizing: border-box;\n  margin: 0 10px;\n}\n.chat-log-left {\n  float: left;\n  width: 25%;\n  box-sizing: border-box;\n  overflow: hidden;\n}\n.chat-log-right {\n  float: right;\n  width: 75%;\n  box-sizing: border-box;\n  overflow: hidden;\n}\n.nav-pills > li.active > a {\n  background-color: #ccc !important;\n}\n", ""]);
 
 // exports
 
@@ -47578,13 +47540,31 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['messages'],
+  props: ['chatrooms'],
 
   data: function data() {
-    return {};
-  }
+    return {
+      usersInRoom: []
+    };
+  },
+
+
+  methods: {},
+
+  created: function created() {}
 });
 
 /***/ }),
@@ -47595,32 +47575,55 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { staticClass: "chat-log" },
-    [
-      _vm._l(_vm.messages, function(message) {
-        return _c("chat-message", { attrs: { message: message } })
-      }),
-      _vm._v(" "),
+  return _c("div", { staticClass: "chat-log" }, [
+    _c("div", { staticClass: "chat-log-left" }, [
       _c(
-        "div",
-        {
-          directives: [
-            {
-              name: "show",
-              rawName: "v-show",
-              value: _vm.messages.length === 0,
-              expression: "messages.length === 0"
-            }
-          ],
-          staticClass: "empty"
-        },
-        [_vm._v("\n    No Messages..\n  ")]
+        "ul",
+        { staticClass: "nav nav-pills nav-stacked" },
+        _vm._l(_vm.chatrooms, function(chatroom) {
+          return _c(
+            "li",
+            { class: chatroom.id === _vm.chatrooms[0].id ? "active" : "" },
+            [
+              _c(
+                "a",
+                {
+                  attrs: {
+                    "data-toggle": "pill",
+                    href: "#chatroom" + chatroom.id
+                  }
+                },
+                [
+                  _vm._v(
+                    "\n        " +
+                      _vm._s(
+                        chatroom.users[0].id == chatroom.pivot.user_id
+                          ? chatroom.users[1].name
+                          : chatroom.users[0].name
+                      ) +
+                      "\n      "
+                  )
+                ]
+              )
+            ]
+          )
+        })
       )
-    ],
-    2
-  )
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "tab-content chat-log-right" },
+      _vm._l(_vm.chatrooms, function(chatroom) {
+        return _c("chat-room", {
+          class:
+            "tab-pane fade" +
+            (chatroom.id === _vm.chatrooms[0].id ? "in active" : ""),
+          attrs: { chatroom: chatroom, id: "chatroom" + chatroom.id }
+        })
+      })
+    )
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -47659,9 +47662,9 @@ var Component = normalizeComponent(
   __vue_scopeId__,
   __vue_module_identifier__
 )
-Component.options.__file = "resources/assets/js/components/chatMessage.vue"
+Component.options.__file = "resources/assets/js/components/chatRoom.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] chatMessage.vue: functional components are not supported with templates, they should use render functions.")}
+if (Component.options.functional) {console.error("[vue-loader] chatRoom.vue: functional components are not supported with templates, they should use render functions.")}
 
 /* hot reload */
 if (false) {(function () {
@@ -47670,9 +47673,9 @@ if (false) {(function () {
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-293aa6f0", Component.options)
+    hotAPI.createRecord("data-v-5935107c", Component.options)
   } else {
-    hotAPI.reload("data-v-293aa6f0", Component.options)
+    hotAPI.reload("data-v-5935107c", Component.options)
   }
   module.hot.dispose(function (data) {
     disposed = true
@@ -47693,13 +47696,13 @@ var content = __webpack_require__(52);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("718ed459", content, false);
+var update = __webpack_require__(4)("11a0285c", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
  if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-293aa6f0\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./chatMessage.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-293aa6f0\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./chatMessage.vue");
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5935107c\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./chatRoom.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5935107c\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./chatRoom.vue");
      if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
      update(newContent);
    });
@@ -47717,7 +47720,7 @@ exports = module.exports = __webpack_require__(3)(undefined);
 
 
 // module
-exports.push([module.i, "\n.chat-message {\n    padding: 1rem;\n}\n.chat-message > p {\n    margin-bottom: .5rem;\n}\n", ""]);
+exports.push([module.i, "\n.chat-room {\n  margin: 0 5px;\n  border: 1px solid #ccc;\n}\n.chat-room .chat-message{\n  margin: 10px;\n}\nsmall {\n  font-size: 70%;\n  color: #FFF !important;\n}\n.sender {\n  text-align: right;\n  background-color: #3097D1;\n}\n.receiver {\n  text-align: left;\n  background-color: #ccc;\n}\n.sender span, .receiver span {\n  max-width: 60%;\n  font-size: 14px;\n}\n.sender, .receiver {\n  color: #000;\n  padding: 2px 4px;\n  margin-bottom: 0;\n  border-radius: 4px;\n}\n.empty {\n  padding: 1rem;\n  text-align: center;\n}\n", ""]);
 
 // exports
 
@@ -47735,12 +47738,63 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['message'],
+  props: ['chatroom'],
 
   data: function data() {
-    return {};
+    return {
+      usersInRoom: []
+    };
+  },
+
+
+  methods: {
+    addMessage: function addMessage(message) {
+      var _this = this;
+
+      // push to the DB
+      axios.post('/messages', {
+        message: message,
+        chatroom_id: this.chatroom.id
+      }).then(function (response) {
+        // Add to existing messages
+        _this.chatroom.messages.push(response.data.message);
+      }).catch(function (error) {
+        if (error.response) {
+          console.log("Error 1");
+          console.log(error.response);
+        } else if (error.request) {
+          console.log("Error 2");
+          console.log(error.request);
+        } else {
+          console.log("Error 3");
+          console.log('Error', error.message);
+        }
+      });
+    }
+  },
+
+  created: function created() {
+    var _this2 = this;
+
+    Echo.join('chatroom.' + this.chatroom.id).here(function (users) {
+      _this2.usersInRoom = users;
+    }).joining(function (user) {
+      _this2.usersInRoom.push(user);
+    }).leaving(function (user) {
+      _this2.usersInRoom = _this2.usersInRoom.filter(function (u) {
+        return u != user;
+      });
+    }).listen('newMessage', function (e) {
+      _this2.chatroom.messages.push(e.message);
+    });
   }
 });
 
@@ -47752,11 +47806,44 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "chat-message" }, [
-    _c("p", [_vm._v(_vm._s(_vm.message.message))]),
-    _vm._v(" "),
-    _c("small", [_vm._v(_vm._s(_vm.message.user.name))])
-  ])
+  return _c(
+    "div",
+    { staticClass: "chat-room" },
+    [
+      _c("p", [
+        _c("i", {
+          staticClass: "fa fa-user-circle-o fa-2x",
+          style:
+            "text-align:center;" +
+            (_vm.usersInRoom.length == 2 ? "color:green;" : ""),
+          attrs: { "aria-hidden": "true" }
+        })
+      ]),
+      _vm._v(" "),
+      _vm._l(_vm.chatroom.messages, function(message) {
+        return _c(
+          "div",
+          {
+            staticClass: "chat-message",
+            class:
+              message.user_id == _vm.chatroom.pivot.user_id
+                ? "sender"
+                : "receiver"
+          },
+          [
+            _c("span", [_vm._v(_vm._s(message.message))]),
+            _vm._v(" "),
+            _c("br"),
+            _vm._v(" "),
+            _c("small", [_vm._v(_vm._s(message.created_at))])
+          ]
+        )
+      }),
+      _vm._v(" "),
+      _c("chat-composer", { on: { messagesent: _vm.addMessage } })
+    ],
+    2
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -47764,7 +47851,7 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-293aa6f0", module.exports)
+     require("vue-hot-reload-api").rerender("data-v-5935107c", module.exports)
   }
 }
 
@@ -47881,14 +47968,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
   methods: {
     sendMessage: function sendMessage() {
-      // console.log(this.newMessage, "Sent");
-      this.$emit('messagesent', {
-        message: this.newMessage,
-        user: {
-          name: $('.navbar-right .dropdown-toggle').text()
-        }
-      });
-      this.newMessage = '';
+      if (this.newMessage) {
+        //not empty message
+        this.$emit('messagesent', this.newMessage);
+        this.newMessage = '';
+      }
     }
   }
 });

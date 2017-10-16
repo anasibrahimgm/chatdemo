@@ -17,7 +17,7 @@ window.Vue = require('vue');
 
 Vue.component('example', require('./components/Example.vue'));
 Vue.component('chat-log', require('./components/chatLog.vue'));
-Vue.component('chat-message', require('./components/chatMessage.vue'));
+Vue.component('chat-room', require('./components/chatRoom.vue'));
 Vue.component('chat-composer', require('./components/chatComposer.vue'));
 
 const app = new Vue({
@@ -25,58 +25,17 @@ const app = new Vue({
 
     data() {
       return {
-        messages: [],
-        usersInRoom: [],
+        chatrooms: [],
       }
     },
 
     methods: {
-      addMessage(message) {
-        // Add to the existing messages
-        this.messages.push(message);
 
-        // push to the DB
-        axios.post('/messages', message)
-        .then(response => {
-          //console.log(response);
-        })
-        .catch(error => {
-          if (error.response) {
-            console.log("Error 1");
-             console.log(error.response);
-
-           } else if (error.request) {
-             console.log("Error 2");
-             console.log(error.request);
-           } else {
-             console.log("Error 3");
-             console.log('Error', error.message);
-           }
-        });
-      }
     },
 
     created() {
-       axios.get('/messages').then(response => {
-           this.messages = response.data;
+       axios.get('/chatrooms').then(response => {
+           this.chatrooms = response.data;
        });
-
-       Echo.join('chatroom')
-           .here((users) => {
-               this.usersInRoom = users;
-              //  console.log("this.usersInRoom: ", this.usersInRoom[0].name);
-           })
-           .joining((user) => {
-               this.usersInRoom.push(user);
-           })
-           .leaving((user) => {
-               this.usersInRoom = this.usersInRoom.filter(u => u != user)
-           })
-           .listen('MessagePosted', (e) => {
-               this.messages.push({
-                   message: e.message.message,
-                   user: e.user
-               });
-           });
    }
 });

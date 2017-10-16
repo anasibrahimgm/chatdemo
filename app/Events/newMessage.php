@@ -1,5 +1,16 @@
 <?php
 
+// event(new ShippingStatusUpdated($update));
+//
+// public function broadcastOn()
+// {
+//     return new PrivateChannel('order.'.$this->update->order_id);
+// }
+//
+// Broadcast::channel('order.{orderId}', function ($user, $orderId) {
+//     return $user->id === Order::findOrNew($orderId)->user_id;
+// });
+
 namespace App\Events;
 
 use App\Message;
@@ -13,7 +24,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class MessagePosted implements ShouldBroadcast
+class newMessage implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -36,10 +47,9 @@ class MessagePosted implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(Message $message, User $user)
+    public function __construct(Message $message)
     {
         $this->message = $message;
-        $this->user = $user;
     }
 
     /**
@@ -49,6 +59,7 @@ class MessagePosted implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PresenceChannel('chatroom');
+        return new PresenceChannel('chatroom.'.$this->message->chatroom_id);
+        // ->toOthers();
     }
 }

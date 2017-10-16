@@ -11,7 +11,10 @@
       </div>
 
       <div class="panel-body">
-        <chat-log :chatrooms="chatrooms"></chat-log>
+        @foreach ($chatrooms as $chatroom)
+          {{ $chatroom->messages }}
+          <!-- {{ $chatroom->other->messages }} -->
+        @endforeach
       </div>
     </div>
   </div>
