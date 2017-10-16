@@ -47487,7 +47487,7 @@ exports = module.exports = __webpack_require__(3)(undefined);
 
 
 // module
-exports.push([module.i, "\na {\n  color: #000 !important;\n}\n.chat-log {\n  overflow: hidden;\n  box-sizing: border-box;\n  margin: 0 10px;\n}\n.chat-log-left {\n  float: left;\n  width: 25%;\n  box-sizing: border-box;\n  overflow: hidden;\n}\n.chat-log-right {\n  float: right;\n  width: 75%;\n  box-sizing: border-box;\n  overflow: hidden;\n}\n.nav-pills > li.active > a {\n  background-color: #ccc !important;\n}\n", ""]);
+exports.push([module.i, "\na {\n  color: #000 !important;\n}\n.activeI {\n  color: green;\n}\n.chat-log {\n  overflow: hidden;\n  box-sizing: border-box;\n  margin: 0 10px;\n}\n.chat-log-left {\n  float: left;\n  width: 25%;\n  box-sizing: border-box;\n  overflow: hidden;\n}\n.chat-log-right {\n  float: right;\n  width: 75%;\n  box-sizing: border-box;\n  overflow: hidden;\n}\n.nav-pills > li.active > a {\n  background-color: #ccc !important;\n}\n", ""]);
 
 // exports
 
@@ -47551,6 +47551,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['chatrooms'],
@@ -47583,7 +47584,10 @@ var render = function() {
         _vm._l(_vm.chatrooms, function(chatroom) {
           return _c(
             "li",
-            { class: chatroom.id === _vm.chatrooms[0].id ? "active" : "" },
+            {
+              class: chatroom.id === _vm.chatrooms[0].id ? "active" : "",
+              attrs: { id: "chatroomli" + chatroom.id }
+            },
             [
               _c(
                 "a",
@@ -47601,8 +47605,13 @@ var render = function() {
                           ? chatroom.users[1].name
                           : chatroom.users[0].name
                       ) +
-                      "\n      "
-                  )
+                      "\n        "
+                  ),
+                  _c("i", {
+                    staticClass: "fa fa-user-circle-o",
+                    staticStyle: { float: "right" },
+                    attrs: { "aria-hidden": "true" }
+                  })
                 ]
               )
             ]
@@ -47741,9 +47750,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['chatroom'],
@@ -47784,14 +47790,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   created: function created() {
     var _this2 = this;
 
+    var element = '#chatroomli' + this.chatroom.id + ' i';
+
     Echo.join('chatroom.' + this.chatroom.id).here(function (users) {
       _this2.usersInRoom = users;
+      if (_this2.usersInRoom.length == 2) $(element).addClass('activeI');
     }).joining(function (user) {
       _this2.usersInRoom.push(user);
+      $(element).addClass('activeI');
     }).leaving(function (user) {
       _this2.usersInRoom = _this2.usersInRoom.filter(function (u) {
         return u != user;
       });
+      $(element).removeClass('activeI');
     }).listen('newMessage', function (e) {
       _this2.chatroom.messages.push(e.message);
     });
@@ -47810,16 +47821,6 @@ var render = function() {
     "div",
     { staticClass: "chat-room" },
     [
-      _c("p", [
-        _c("i", {
-          staticClass: "fa fa-user-circle-o fa-2x",
-          style:
-            "text-align:center;" +
-            (_vm.usersInRoom.length == 2 ? "color:green;" : ""),
-          attrs: { "aria-hidden": "true" }
-        })
-      ]),
-      _vm._v(" "),
       _vm._l(_vm.chatroom.messages, function(message) {
         return _c(
           "div",

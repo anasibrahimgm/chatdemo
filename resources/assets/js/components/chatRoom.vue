@@ -1,8 +1,5 @@
 <template>
   <div class="chat-room">
-    <p>
-      <i class="fa fa-user-circle-o fa-2x" aria-hidden="true" :style="'text-align:center;' + (usersInRoom.length == 2 ? 'color:green;':'')"></i>
-    </p>
     <div class="chat-message" v-for="message in chatroom.messages" :class="message.user_id == chatroom.pivot.user_id ? 'sender' : 'receiver'">
       <span>{{ message.message }}</span>
       <br />
@@ -49,15 +46,21 @@ export default {
   },
 
   created() {
+    var element = '#chatroomli' + this.chatroom.id + ' i';
+
     Echo.join(`chatroom.${this.chatroom.id}`)
         .here((users) => {
             this.usersInRoom = users;
+            if (this.usersInRoom.length == 2 )
+              $(element).addClass('activeI');
         })
         .joining((user) => {
             this.usersInRoom.push(user);
+            $(element).addClass('activeI');
         })
         .leaving((user) => {
-            this.usersInRoom = this.usersInRoom.filter(u => u != user)
+            this.usersInRoom = this.usersInRoom.filter(u => u != user);
+            $(element).removeClass('activeI');            
         })
         .listen('newMessage', (e) => {
           this.chatroom.messages.push(e.message);

@@ -1,16 +1,5 @@
 <?php
 
-// event(new ShippingStatusUpdated($update));
-//
-// public function broadcastOn()
-// {
-//     return new PrivateChannel('order.'.$this->update->order_id);
-// }
-//
-// Broadcast::channel('order.{orderId}', function ($user, $orderId) {
-//     return $user->id === Order::findOrNew($orderId)->user_id;
-// });
-
 namespace App\Events;
 
 use App\Message;

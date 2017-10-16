@@ -2,8 +2,9 @@
   <div class="chat-log">
     <div class="chat-log-left">
       <ul class="nav nav-pills nav-stacked">
-        <li v-for="chatroom in chatrooms" :class="chatroom.id === chatrooms[0].id ? 'active' : ''"><a data-toggle="pill" :href="'#chatroom'+chatroom.id">
+        <li v-for="chatroom in chatrooms" :id="'chatroomli'+chatroom.id" :class="chatroom.id === chatrooms[0].id ? 'active' : ''"><a data-toggle="pill" :href="'#chatroom'+chatroom.id">
           {{ chatroom.users[0].id == chatroom.pivot.user_id ? chatroom.users[1].name : chatroom.users[0].name }}
+          <i class="fa fa-user-circle-o" aria-hidden="true" style="float:right;"></i>
         </a></li>
       </ul>
     </div>
@@ -40,6 +41,10 @@ export default {
 <style>
 a {
   color: #000 !important;
+}
+
+.activeI {
+  color: green;
 }
 
 .chat-log {
