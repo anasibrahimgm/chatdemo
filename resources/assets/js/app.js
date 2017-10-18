@@ -15,7 +15,6 @@ window.Vue = require('vue');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('example', require('./components/Example.vue'));
 Vue.component('chat-log', require('./components/chatLog.vue'));
 Vue.component('chat-room', require('./components/chatRoom.vue'));
 Vue.component('chat-composer', require('./components/chatComposer.vue'));
@@ -25,6 +24,8 @@ const app = new Vue({
 
     data() {
       return {
+        allUsers: [],
+        authUser: {},
         chatrooms: [],
       }
     },
@@ -35,7 +36,10 @@ const app = new Vue({
 
     created() {
        axios.get('/chatrooms').then(response => {
-           this.chatrooms = response.data;
+          // console.log('response: ', response);
+           this.authUser = response.data.authUser;
+           this.allUsers = response.data.allUsers;
+           this.chatrooms = response.data.chatrooms;
        });
    }
 });

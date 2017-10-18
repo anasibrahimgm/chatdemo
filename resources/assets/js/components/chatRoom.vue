@@ -1,9 +1,11 @@
 <template>
   <div class="chat-room">
-    <div v-for="message in chatroom.messages"  :class="'chat-message ' + (message.user_id == chatroom.pivot.user_id ? 'sender' : 'receiver')">
+    <p v-show="!chatroom.messages.length">Say Hi...</p>
+    <div v-for="(message, index) in chatroom.messages"  :class="'chat-message ' + (message.user_id == authUser.id ? 'sender' : 'receiver')">
       <div class="msg-text">
         <p style="margin-bottom:0;">{{ message.message }}</p>
         <small style="text-align:right;">{{ message.created_at }}</small>
+        <h5 style="color: #F00;text-align: right;font-size: small;font-style: italic;" v-show="message.newMessageError">{{ message.newMessageError }}<span style="cursor:pointer;" @click="addFailedMessage(message.message, index)">Try Again</span></h5>
       </div>
     </div>
     <chat-composer v-on:messagesent="addMessage"></chat-composer>
@@ -11,26 +13,41 @@
 </template>
 <script>
 export default {
-  props: ['chatroom'],
+  props: ['authUser', 'chatroom'],
 
   data() {
     return {
+      receiver: {},
       usersInRoom: [],
+      date: new Date(),
     }
   },
 
   methods: {
+    addFailedMessage(message, index) {
+      this.addMessage(message);
+      this.chatroom.messages[index] = {};
+    },
+
     addMessage(message) {
+      // Add to existing messages
+      this.chatroom.messages.push({
+        message: message,
+        newMessageError: '',
+        user_id: this.authUser.id,
+        created_at: this.date.getFullYear() + '-' + (this.date.getMonth() + 1) + '-' + this.date.getDate() + ' ' + this.date.getHours() + '-' + this.date.getMinutes() + '-' + this.date.getSeconds(),
+      });
       // push to the DB
       axios.post('/messages', {
         message: message,
         chatroom_id: this.chatroom.id,
+        receiver_id: this.receiver.id,
       })
       .then(response => {
-        // Add to existing messages
-        this.chatroom.messages.push(response.data.message);
+
       })
       .catch(error => {
+        this.chatroom.messages[this.chatroom.messages.length - 1].newMessageError = 'Error..Not Sent! ';
         if (error.response) {
           console.log("Error 1");
            console.log(error.response);
@@ -47,6 +64,8 @@ export default {
   },
 
   created() {
+    this.receiver = ( (this.chatroom.users[0].id == this.authUser.id) ? this.chatroom.users[1] : this.chatroom.users[0] );
+
     var element = '#chatroomli' + this.chatroom.id + ' i';
 
     Echo.join(`chatroom.${this.chatroom.id}`)

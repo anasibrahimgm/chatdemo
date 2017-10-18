@@ -24,12 +24,10 @@ Route::get('/chat', function () {
 })->middleware('auth');
 
 Route::get('/chatrooms', 'ChatController@index')->middleware('auth');
+Route::get('/chatusers', 'ChatController@chatUsers')->middleware('auth');
 
 Route::post('/messages', 'ChatController@newMessage')->middleware('auth');
 
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
-
-Route::get('/test', function () {
-})->middleware('auth');
