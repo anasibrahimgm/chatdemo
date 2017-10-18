@@ -375,103 +375,6 @@ module.exports = {
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
-
-/* globals __VUE_SSR_CONTEXT__ */
-
-// this module is a runtime utility for cleaner component module output and will
-// be included in the final webpack user bundle
-
-module.exports = function normalizeComponent (
-  rawScriptExports,
-  compiledTemplate,
-  injectStyles,
-  scopeId,
-  moduleIdentifier /* server only */
-) {
-  var esModule
-  var scriptExports = rawScriptExports = rawScriptExports || {}
-
-  // ES6 modules interop
-  var type = typeof rawScriptExports.default
-  if (type === 'object' || type === 'function') {
-    esModule = rawScriptExports
-    scriptExports = rawScriptExports.default
-  }
-
-  // Vue.extend constructor export interop
-  var options = typeof scriptExports === 'function'
-    ? scriptExports.options
-    : scriptExports
-
-  // render functions
-  if (compiledTemplate) {
-    options.render = compiledTemplate.render
-    options.staticRenderFns = compiledTemplate.staticRenderFns
-  }
-
-  // scopedId
-  if (scopeId) {
-    options._scopeId = scopeId
-  }
-
-  var hook
-  if (moduleIdentifier) { // server build
-    hook = function (context) {
-      // 2.3 injection
-      context =
-        context || // cached call
-        (this.$vnode && this.$vnode.ssrContext) || // stateful
-        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
-      // 2.2 with runInNewContext: true
-      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-        context = __VUE_SSR_CONTEXT__
-      }
-      // inject component styles
-      if (injectStyles) {
-        injectStyles.call(this, context)
-      }
-      // register component module identifier for async chunk inferrence
-      if (context && context._registeredComponents) {
-        context._registeredComponents.add(moduleIdentifier)
-      }
-    }
-    // used by ssr in case component is cached and beforeCreate
-    // never gets called
-    options._ssrRegister = hook
-  } else if (injectStyles) {
-    hook = injectStyles
-  }
-
-  if (hook) {
-    var functional = options.functional
-    var existing = functional
-      ? options.render
-      : options.beforeCreate
-    if (!functional) {
-      // inject component registration as beforeCreate hook
-      options.beforeCreate = existing
-        ? [].concat(existing, hook)
-        : [hook]
-    } else {
-      // register for functioal component in vue file
-      options.render = function renderWithStyleInjection (h, context) {
-        hook.call(context)
-        return existing(h, context)
-      }
-    }
-  }
-
-  return {
-    esModule: esModule,
-    exports: scriptExports,
-    options: options
-  }
-}
-
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -571,7 +474,7 @@ module.exports = defaults;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22)))
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, exports) {
 
 /*
@@ -653,7 +556,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -672,7 +575,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(47)
+var listToStyles = __webpack_require__(44)
 
 /*
 type StyleObject = {
@@ -869,6 +772,103 @@ function applyToTag (styleElement, obj) {
       styleElement.removeChild(styleElement.firstChild)
     }
     styleElement.appendChild(document.createTextNode(css))
+  }
+}
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+/* globals __VUE_SSR_CONTEXT__ */
+
+// this module is a runtime utility for cleaner component module output and will
+// be included in the final webpack user bundle
+
+module.exports = function normalizeComponent (
+  rawScriptExports,
+  compiledTemplate,
+  injectStyles,
+  scopeId,
+  moduleIdentifier /* server only */
+) {
+  var esModule
+  var scriptExports = rawScriptExports = rawScriptExports || {}
+
+  // ES6 modules interop
+  var type = typeof rawScriptExports.default
+  if (type === 'object' || type === 'function') {
+    esModule = rawScriptExports
+    scriptExports = rawScriptExports.default
+  }
+
+  // Vue.extend constructor export interop
+  var options = typeof scriptExports === 'function'
+    ? scriptExports.options
+    : scriptExports
+
+  // render functions
+  if (compiledTemplate) {
+    options.render = compiledTemplate.render
+    options.staticRenderFns = compiledTemplate.staticRenderFns
+  }
+
+  // scopedId
+  if (scopeId) {
+    options._scopeId = scopeId
+  }
+
+  var hook
+  if (moduleIdentifier) { // server build
+    hook = function (context) {
+      // 2.3 injection
+      context =
+        context || // cached call
+        (this.$vnode && this.$vnode.ssrContext) || // stateful
+        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
+      // 2.2 with runInNewContext: true
+      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+        context = __VUE_SSR_CONTEXT__
+      }
+      // inject component styles
+      if (injectStyles) {
+        injectStyles.call(this, context)
+      }
+      // register component module identifier for async chunk inferrence
+      if (context && context._registeredComponents) {
+        context._registeredComponents.add(moduleIdentifier)
+      }
+    }
+    // used by ssr in case component is cached and beforeCreate
+    // never gets called
+    options._ssrRegister = hook
+  } else if (injectStyles) {
+    hook = injectStyles
+  }
+
+  if (hook) {
+    var functional = options.functional
+    var existing = functional
+      ? options.render
+      : options.beforeCreate
+    if (!functional) {
+      // inject component registration as beforeCreate hook
+      options.beforeCreate = existing
+        ? [].concat(existing, hook)
+        : [hook]
+    } else {
+      // register for functioal component in vue file
+      options.render = function renderWithStyleInjection (h, context) {
+        hook.call(context)
+        return existing(h, context)
+      }
+    }
+  }
+
+  return {
+    esModule: esModule,
+    exports: scriptExports,
+    options: options
   }
 }
 
@@ -1173,7 +1173,7 @@ module.exports = Cancel;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(12);
-module.exports = __webpack_require__(60);
+module.exports = __webpack_require__(57);
 
 
 /***/ }),
@@ -1197,9 +1197,9 @@ window.Vue = __webpack_require__(40);
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('chat-log', __webpack_require__(44));
-Vue.component('chat-room', __webpack_require__(50));
-Vue.component('chat-composer', __webpack_require__(55));
+Vue.component('chat-log', __webpack_require__(41));
+Vue.component('chat-room', __webpack_require__(47));
+Vue.component('chat-composer', __webpack_require__(52));
 
 var app = new Vue({
   el: '#app',
@@ -31070,7 +31070,7 @@ module.exports = __webpack_require__(19);
 var utils = __webpack_require__(0);
 var bind = __webpack_require__(6);
 var Axios = __webpack_require__(21);
-var defaults = __webpack_require__(2);
+var defaults = __webpack_require__(1);
 
 /**
  * Create an instance of Axios
@@ -31153,7 +31153,7 @@ function isSlowBuffer (obj) {
 "use strict";
 
 
-var defaults = __webpack_require__(2);
+var defaults = __webpack_require__(1);
 var utils = __webpack_require__(0);
 var InterceptorManager = __webpack_require__(31);
 var dispatchRequest = __webpack_require__(32);
@@ -31875,7 +31875,7 @@ module.exports = InterceptorManager;
 var utils = __webpack_require__(0);
 var transformData = __webpack_require__(33);
 var isCancel = __webpack_require__(9);
-var defaults = __webpack_require__(2);
+var defaults = __webpack_require__(1);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -47289,22 +47289,19 @@ module.exports = Vue$3;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
-/* 41 */,
-/* 42 */,
-/* 43 */,
-/* 44 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(45)
+  __webpack_require__(42)
 }
-var normalizeComponent = __webpack_require__(1)
+var normalizeComponent = __webpack_require__(4)
 /* script */
-var __vue_script__ = __webpack_require__(48)
+var __vue_script__ = __webpack_require__(45)
 /* template */
-var __vue_template__ = __webpack_require__(49)
+var __vue_template__ = __webpack_require__(46)
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
@@ -47342,17 +47339,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 45 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(46);
+var content = __webpack_require__(43);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("00204442", content, false);
+var update = __webpack_require__(3)("00204442", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -47368,10 +47365,10 @@ if(false) {
 }
 
 /***/ }),
-/* 46 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
@@ -47382,7 +47379,7 @@ exports.push([module.i, "\na {\n  color: #000 !important;\n}\n.activeI {\n  colo
 
 
 /***/ }),
-/* 47 */
+/* 44 */
 /***/ (function(module, exports) {
 
 /**
@@ -47415,11 +47412,12 @@ module.exports = function listToStyles (parentId, list) {
 
 
 /***/ }),
-/* 48 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
 //
 //
 //
@@ -47456,7 +47454,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     return {
       usersInRoom: [],
       search: '',
-      searching: false,
       chatUsers: []
     };
   },
@@ -47476,108 +47473,109 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       }
     },
     addChatroom: function addChatroom(user) {
-      this.chatrooms.push({
+      this.chatrooms.unshift({
         "id": 0,
         "messages": [],
         "users": [{ 'id': this.authUser.id }, user]
       });
       // $('#chatroom1').removeClass('active');
       // $('#chatroom0').addClass('active');
-    },
-    filteredUsers: function filteredUsers() {
-      var _this = this;
-
-      this.allUsers = this.allUsers.filter(function (user) {
-        return user.match(_this.search);
-      });
     }
   },
 
   created: function created() {
-    var _this2 = this;
+    var _this = this;
 
     axios.get('/chatusers').then(function (response) {
-      _this2.chatUsers = response.data.chatUsers;
+      _this.chatUsers = response.data.chatUsers;
       // console.log('this.chatUsers: ', this.chatUsers);
     });
   },
 
 
   computed: {
-    confirmClass: function confirmClass() {
-      if (this.user_password != this.user_password_confirmation) {
-        return true;
-      }
+    filteredUsers: function filteredUsers() {
+      var _this2 = this;
+
+      return this.allUsers.filter(function (user) {
+        return user.name.match(_this2.search);
+      });
+      // console.log('this.allUsers:', this.allUsers);
     }
   }
 });
 
 /***/ }),
-/* 49 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { staticClass: "chat-log" },
-    [
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.search,
-            expression: "search"
-          }
-        ],
-        staticClass: "form-control",
-        attrs: { type: "text", placeholder: "search..." },
-        domProps: { value: _vm.search },
-        on: {
-          click: function($event) {
-            _vm.searching = "true"
-          },
-          input: function($event) {
-            if ($event.target.composing) {
-              return
-            }
-            _vm.search = $event.target.value
-          }
-        }
-      }),
-      _vm._v(" "),
-      _vm._l(_vm.allUsers, function(user) {
-        return _c(
-          "p",
-          {
-            directives: [
-              {
-                name: "show",
-                rawName: "v-show",
-                value: _vm.searching,
-                expression: "searching"
-              }
-            ],
-            staticStyle: { cursor: "pointer" },
-            on: {
-              click: function($event) {
-                _vm.newChatRoom(user)
-              }
-            }
-          },
-          [_vm._v("\n    " + _vm._s(user.name) + "\n  ")]
-        )
-      }),
-      _vm._v(" "),
-      _c("br"),
-      _vm._v(" "),
-      _c("div", { staticClass: "chat-log-left" }, [
-        _c(
-          "ul",
-          { staticClass: "nav nav-pills nav-stacked" },
+  return _c("div", { staticClass: "chat-log" }, [
+    _c("div", { staticClass: "chat-log-left" }, [
+      _c(
+        "ul",
+        { staticClass: "nav nav-pills nav-stacked" },
+        [
+          _c(
+            "div",
+            {
+              staticClass: "dropdown",
+              staticStyle: { "margin-bottom": "10px" }
+            },
+            [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.search,
+                    expression: "search"
+                  }
+                ],
+                staticClass: "form-control dropdown-toggle",
+                attrs: {
+                  type: "text",
+                  "data-toggle": "dropdown",
+                  placeholder: "search..."
+                },
+                domProps: { value: _vm.search },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.search = $event.target.value
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c(
+                "ul",
+                { staticClass: "dropdown-menu" },
+                _vm._l(_vm.filteredUsers, function(user) {
+                  return _c(
+                    "li",
+                    {
+                      on: {
+                        click: function($event) {
+                          _vm.newChatRoom(user)
+                        }
+                      }
+                    },
+                    [
+                      _c("a", { attrs: { href: "#" } }, [
+                        _vm._v(_vm._s(user.name))
+                      ])
+                    ]
+                  )
+                })
+              )
+            ]
+          ),
+          _vm._v(" "),
           _vm._l(_vm.chatrooms, function(chatroom) {
             return _c(
               "li",
@@ -47614,28 +47612,28 @@ var render = function() {
               ]
             )
           })
-        )
-      ]),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "tab-content chat-log-right" },
-        _vm._l(_vm.chatrooms, function(chatroom) {
-          return _c("chat-room", {
-            class:
-              "tab-pane fade" +
-              (chatroom.id === _vm.chatrooms[0].id ? "in active" : ""),
-            attrs: {
-              authUser: _vm.authUser,
-              chatroom: chatroom,
-              id: "chatroom" + chatroom.id
-            }
-          })
-        })
+        ],
+        2
       )
-    ],
-    2
-  )
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "tab-content chat-log-right" },
+      _vm._l(_vm.chatrooms, function(chatroom) {
+        return _c("chat-room", {
+          class:
+            "tab-pane fade" +
+            (chatroom.id === _vm.chatrooms[0].id ? "in active" : ""),
+          attrs: {
+            authUser: _vm.authUser,
+            chatroom: chatroom,
+            id: "chatroom" + chatroom.id
+          }
+        })
+      })
+    )
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -47648,19 +47646,19 @@ if (false) {
 }
 
 /***/ }),
-/* 50 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(51)
+  __webpack_require__(48)
 }
-var normalizeComponent = __webpack_require__(1)
+var normalizeComponent = __webpack_require__(4)
 /* script */
-var __vue_script__ = __webpack_require__(53)
+var __vue_script__ = __webpack_require__(50)
 /* template */
-var __vue_template__ = __webpack_require__(54)
+var __vue_template__ = __webpack_require__(51)
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
@@ -47698,17 +47696,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 51 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(52);
+var content = __webpack_require__(49);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("11a0285c", content, false);
+var update = __webpack_require__(3)("11a0285c", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -47724,26 +47722,25 @@ if(false) {
 }
 
 /***/ }),
-/* 52 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
 // module
-exports.push([module.i, "\n.chat-room {\n  margin: 0 5px;\n  border: 1px solid #ccc;\n}\n.chat-message {\n  overflow: hidden;\n  box-sizing: border-box;\n  margin: 5px;\n}\n.msg-text {\n  padding: 2px 4px;\n  margin-bottom: 0;\n  border-radius: 4px;\n  font-size: 14px;\n  color: #FFF;\n}\n.receiver .msg-text{\n  background-color: #ccc;\n  max-width: 70%;\n  float: left;\n  box-sizing: border-box;\n  overflow: hidden;\n}\n.sender .msg-text {\n  max-width: 70%;\n  float: right;\n  box-sizing: border-box;\n  overflow: hidden;\n  background-color: #3097D1;\n}\nsmall {\n  font-size: 70%;\n  color: #777777 !important;\n}\n", ""]);
+exports.push([module.i, "\n.chat-room {\n  margin: 0 5px;\n  border: 1px solid #ccc;\n  border-radius: 5px;\n}\n.chat-message {\n  overflow: hidden;\n  box-sizing: border-box;\n  margin: 5px;\n}\n.msg-text {\n  padding: 2px 4px;\n  margin-bottom: 0;\n  border-radius: 4px;\n  font-size: 14px;\n  color: #FFF;\n}\n.receiver .msg-text{\n  background-color: #ccc;\n  max-width: 70%;\n  float: left;\n  box-sizing: border-box;\n  overflow: hidden;\n}\n.sender .msg-text {\n  max-width: 70%;\n  float: right;\n  box-sizing: border-box;\n  overflow: hidden;\n  background-color: #3097D1;\n}\nsmall {\n  font-size: 70%;\n  color: #777777 !important;\n}\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 53 */
+/* 50 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
 //
 //
 //
@@ -47830,7 +47827,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 54 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -47841,21 +47838,6 @@ var render = function() {
     "div",
     { staticClass: "chat-room" },
     [
-      _c(
-        "p",
-        {
-          directives: [
-            {
-              name: "show",
-              rawName: "v-show",
-              value: !_vm.chatroom.messages.length,
-              expression: "!chatroom.messages.length"
-            }
-          ]
-        },
-        [_vm._v("Say Hi...")]
-      ),
-      _vm._v(" "),
       _vm._l(_vm.chatroom.messages, function(message, index) {
         return _c(
           "div",
@@ -47929,19 +47911,19 @@ if (false) {
 }
 
 /***/ }),
-/* 55 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(56)
+  __webpack_require__(53)
 }
-var normalizeComponent = __webpack_require__(1)
+var normalizeComponent = __webpack_require__(4)
 /* script */
-var __vue_script__ = __webpack_require__(58)
+var __vue_script__ = __webpack_require__(55)
 /* template */
-var __vue_template__ = __webpack_require__(59)
+var __vue_template__ = __webpack_require__(56)
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
@@ -47979,17 +47961,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 56 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(57);
+var content = __webpack_require__(54);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(4)("74c053a1", content, false);
+var update = __webpack_require__(3)("74c053a1", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -48005,10 +47987,10 @@ if(false) {
 }
 
 /***/ }),
-/* 57 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(3)(undefined);
+exports = module.exports = __webpack_require__(2)(undefined);
 // imports
 
 
@@ -48019,7 +48001,7 @@ exports.push([module.i, "\n.chat-composer {\n  display: flex;\n  margin: 10px;\n
 
 
 /***/ }),
-/* 58 */
+/* 55 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -48051,7 +48033,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 59 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -48098,7 +48080,7 @@ if (false) {
 }
 
 /***/ }),
-/* 60 */
+/* 57 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin

@@ -1,6 +1,5 @@
 <template>
   <div class="chat-room">
-    <p v-show="!chatroom.messages.length">Say Hi...</p>
     <div v-for="(message, index) in chatroom.messages"  :class="'chat-message ' + (message.user_id == authUser.id ? 'sender' : 'receiver')">
       <div class="msg-text">
         <p style="margin-bottom:0;">{{ message.message }}</p>
@@ -93,6 +92,7 @@ export default {
 .chat-room {
   margin: 0 5px;
   border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .chat-message {

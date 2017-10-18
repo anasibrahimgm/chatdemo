@@ -1,13 +1,14 @@
 <template>
   <div class="chat-log">
-    <input type="text" class="form-control" v-model="search" placeholder="search..." @click="searching = 'true'" />
-    <p v-show="searching" v-for="user in allUsers" style="cursor:pointer;" @click="newChatRoom(user)">
-      {{ user.name }}
-    </p>
-    <br />
-    <!-- <button class="btn btn-default btn-block" @click="addChatroom">Add chat room</button> -->
     <div class="chat-log-left">
       <ul class="nav nav-pills nav-stacked">
+        <div class="dropdown" style="margin-bottom: 10px;">
+          <input v-model="search" type="text" class="form-control dropdown-toggle" data-toggle="dropdown" placeholder="search..." />
+          <ul class="dropdown-menu">
+            <li v-for="user in filteredUsers" @click="newChatRoom(user)"><a href="#">{{ user.name }}</a></li>
+          </ul>
+        </div>
+
         <li v-for="chatroom in chatrooms" :id="'chatroomli'+chatroom.id" :class="chatroom.id === chatrooms[0].id ? 'active' : ''"><a data-toggle="pill" :href="'#chatroom'+chatroom.id">
           {{ chatroom.users[0].id == authUser.id ? chatroom.users[1].name : chatroom.users[0].name }}
           <i class="fa fa-user-circle-o" aria-hidden="true" style="float:right;"></i>
@@ -34,7 +35,6 @@ export default {
     return {
       usersInRoom: [],
       search: '',
-      searching: false,
       chatUsers: [],
     }
   },
@@ -55,19 +55,13 @@ export default {
     },
 
     addChatroom(user){
-      this.chatrooms.push({
+      this.chatrooms.unshift({
           "id": 0,
           "messages": [],
           "users": [{'id':this.authUser.id }, user],
         });
       // $('#chatroom1').removeClass('active');
       // $('#chatroom0').addClass('active');
-    },
-
-    filteredUsers() {
-      this.allUsers = this.allUsers.filter((user) => {
-        return user.match(this.search);
-      });
     },
   },
 
@@ -79,11 +73,11 @@ export default {
   },
 
   computed: {
-    confirmClass() {
-        if (this.user_password != this.user_password_confirmation)
-        {
-          return true;
-        }
+    filteredUsers() {
+      return this.allUsers.filter((user) => {
+        return user.name.match(this.search);
+      });
+      // console.log('this.allUsers:', this.allUsers);
     },
   },
 }
